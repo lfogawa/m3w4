@@ -1,14 +1,24 @@
 package com.devinhouse.m03w04.library.model;
 
+import com.devinhouse.m03w04.library.model.dtos.operations.create.CreatePersonForm;
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.UUID;
 
 @Entity
 @Table(name = "PERSON")
-public class Person {
+public class Person implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
-    private Integer person_id;
+    private Long person_id;
+
+    @Column(unique = true, nullable = false)
+    private String guid;
 
     @Column(nullable = false)
     private String name;
@@ -22,19 +32,27 @@ public class Person {
     public Person() {
     }
 
-    public Person(Integer id, String name, String email, String password) {
-        this.person_id = id;
+    public Person(CreatePersonForm form, String password) {
+        this.guid = UUID.randomUUID().toString();
         this.name = name;
         this.email = email;
         this.password = password;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return person_id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.person_id = id;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 
     public String getName() {
@@ -53,8 +71,38 @@ public class Person {
         this.email = email;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.emptyList();
+    }
+
     public String getPassword() {
-        return password;
+        return this.password;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
     public void setPassword(String password) {
