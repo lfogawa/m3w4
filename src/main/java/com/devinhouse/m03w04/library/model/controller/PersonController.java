@@ -3,11 +3,11 @@ package com.devinhouse.m03w04.library.model.controller;
 import com.devinhouse.m03w04.library.model.dtos.PersonRequest;
 import com.devinhouse.m03w04.library.model.dtos.operations.create.CreatePersonForm;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import com.devinhouse.m03w04.library.service.PersonService;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/person")
@@ -25,9 +25,8 @@ public class PersonController {
     }
 
     @PostMapping
-    public ResponseEntity<PersonRequest> create(@RequestBody @Valid CreatePersonForm form, UriComponentsBuilder uriComponentsBuilder) {
-        PersonRequest response = this.personService.create(form);
-        return ResponseEntity.created(uriComponentsBuilder.path("/person/{id}").buildAndExpand(response.guid()).toUri()).body(response);
+    public ResponseEntity<PersonRequest> createUser(@Valid @RequestBody CreatePersonForm createPersonForm) {
+        PersonRequest personRequest = personService.create(createPersonForm);
+        return new ResponseEntity<>(personRequest, HttpStatus.CREATED);
     }
-
 }

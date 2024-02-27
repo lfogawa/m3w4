@@ -10,17 +10,19 @@ import java.util.List;
 public class Rating {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
-    private Integer id;
+    @Column(name = "rating_id",nullable = false)
+    private Integer ratingId;
 
     @Range(min = 1, max = 5)
     @Column(nullable = false)
     private Integer score;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "person_id")
     private Person person;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "book_id")
     private Book book;
 
 

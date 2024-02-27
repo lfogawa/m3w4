@@ -9,8 +9,8 @@ import java.util.List;
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
-    private Integer book_id;
+    @Column(name = "book_id",nullable = false)
+    private Integer bookId;
 
     @Column(nullable = false)
     private String title;

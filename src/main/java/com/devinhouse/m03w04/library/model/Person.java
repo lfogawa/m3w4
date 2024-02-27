@@ -14,8 +14,8 @@ import java.util.UUID;
 public class Person implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
-    private Long person_id;
+    @Column(name = "person_id", nullable = false)
+    private Long personId;
 
     @Column(unique = true, nullable = false)
     private String guid;
@@ -34,17 +34,17 @@ public class Person implements UserDetails {
 
     public Person(CreatePersonForm form, String password) {
         this.guid = UUID.randomUUID().toString();
-        this.name = name;
-        this.email = email;
+        this.name = form.name();
+        this.email = form.email();
         this.password = password;
     }
 
     public Long getId() {
-        return person_id;
+        return personId;
     }
 
     public void setId(Long id) {
-        this.person_id = id;
+        this.personId = id;
     }
 
     public String getGuid() {

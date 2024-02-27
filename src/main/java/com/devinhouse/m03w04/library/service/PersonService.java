@@ -32,7 +32,7 @@ public class PersonService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("User by e-mail not found: %s", email)));
     }
 
-    public Person findById(String guid) throws UsernameNotFoundException{
+    public Person findByGuid(String guid) throws UsernameNotFoundException{
         return this.personRepository.findByGuid(guid)
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("User by GUID not found: %s", guid)));
     }
@@ -45,9 +45,8 @@ public class PersonService implements UserDetailsService {
 
     @Transactional
     public PersonRequest create(CreatePersonForm form){
-        String password = this.passwordEncoder.encode(form.password());
-        Person person = new Person(form, password);
-        this.personRepository.save(person);
+        String passwordEncoded = this.passwordEncoder.encode(form.password());
+        Person person = this.personRepository.save(new Person(form, passwordEncoded));
         return new PersonRequest(person);
     }
 }
