@@ -7,4 +7,5 @@ public record PersonRequest(@NotBlank String guid, @NotBlank String name, @NotBl
     public PersonRequest(Person person){
         this(person.getGuid(), person.getName(), person.getEmail());
     }
+
 }

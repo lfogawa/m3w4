@@ -3,6 +3,8 @@ package com.devinhouse.m03w04.library.service;
 import com.devinhouse.m03w04.library.model.dtos.PersonRequest;
 import com.devinhouse.m03w04.library.model.Person;
 import com.devinhouse.m03w04.library.model.dtos.operations.create.CreatePersonForm;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -10,6 +12,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.devinhouse.m03w04.library.repository.PersonRepository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class PersonService implements UserDetailsService {
@@ -44,9 +50,17 @@ public class PersonService implements UserDetailsService {
 
 
     @Transactional
-    public PersonRequest create(CreatePersonForm form){
-        String passwordEncoded = this.passwordEncoder.encode(form.password());
-        Person person = this.personRepository.save(new Person(form, passwordEncoded));
-        return new PersonRequest(person);
+    public ResponseEntity<String> create(CreatePersonForm form) {
+        try {
+            if (personRepository.existsByEmail(form.email())) {
+                throw new Exception("User with this email already exists");
+            }
+
+            String passwordEncoded = this.passwordEncoder.encode(form.password());
+            Person person = this.personRepository.save(new Person(form, passwordEncoded));
+            return ResponseEntity.ok("User created successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 }

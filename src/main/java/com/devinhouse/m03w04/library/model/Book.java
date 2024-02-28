@@ -15,16 +15,29 @@ public class Book {
     @Column(nullable = false)
     private String title;
 
-    @ManyToOne
-    @JoinColumn(name = "owner_guid", referencedColumnName = "guid", nullable = false)
-    @JoinColumn(name = "owner_email", referencedColumnName = "email", nullable = false)
-    private Person owner;
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "registered_by_guid", referencedColumnName = "guid", nullable = false)
+    @JoinColumn(name = "registered_by_email", referencedColumnName = "email", nullable = false)
+    private Person registeredBy;
 
     @Column(nullable = false)
     private Integer year;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "book_id")
     private List<Rating> ratings;
+
+    public Double calculateAverageRating() {
+        if (ratings == null || ratings.isEmpty()) {
+            return 0.0;
+        }
+
+        double sum = ratings.stream()
+                .mapToDouble(Rating::getRating)
+                .sum();
+
+        return sum / ratings.size();
+    }
 
     public Book() {
     }
@@ -33,7 +46,14 @@ public class Book {
         this.bookId = bookId;
         this.title = title;
         this.year = year;
-        this.owner = person;
+        this.registeredBy = person;
+    }
+
+    public Book(String title, Integer year, Person person, List<Rating> ratings) {
+        this.title = title;
+        this.year = year;
+        this.registeredBy = person;
+        this.ratings = ratings;
     }
 
     public Integer getBookId() {
@@ -60,12 +80,12 @@ public class Book {
         this.year = year;
     }
 
-    public Person getOwner() {
-        return owner;
+    public Person getRegisteredBy() {
+        return registeredBy;
     }
 
-    public void setOwner(Person owner) {
-        this.owner = owner;
+    public void setRegisteredBy(Person registeredBy) {
+        this.registeredBy = registeredBy;
     }
 
     public List<Rating> getRatings() {

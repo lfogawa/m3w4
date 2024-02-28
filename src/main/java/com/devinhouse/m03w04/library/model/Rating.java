@@ -3,8 +3,6 @@ package com.devinhouse.m03w04.library.model;
 import jakarta.persistence.*;
 import org.hibernate.validator.constraints.Range;
 
-import java.util.List;
-
 @Entity
 @Table(name = "RATING")
 public class Rating {
@@ -15,7 +13,7 @@ public class Rating {
 
     @Range(min = 1, max = 5)
     @Column(nullable = false)
-    private Integer score;
+    private Double rating;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "person_id")
@@ -25,5 +23,35 @@ public class Rating {
     @JoinColumn(name = "book_id")
     private Book book;
 
+    public Integer getRatingId() {
+        return ratingId;
+    }
 
+    public void setRatingId(Integer ratingId) {
+        this.ratingId = ratingId;
+    }
+
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
+    }
+
+    public Person getPerson() {
+        return person;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
+    }
+
+    public Book getBook() {
+        return book;
+    }
+
+    public void setBook(Book book) {
+        this.book = book;
+    }
 }

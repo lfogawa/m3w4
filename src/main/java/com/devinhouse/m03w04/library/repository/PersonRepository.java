@@ -10,4 +10,6 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
 
     Optional<Person> findByGuid(String guid);
 
+    boolean existsByEmail(String email);
+
 }
