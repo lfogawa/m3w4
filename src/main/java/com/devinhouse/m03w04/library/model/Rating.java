@@ -20,7 +20,6 @@ public class Rating {
     private Person person;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "book_id")
     private Book book;
 
     public Integer getRatingId() {
@@ -53,5 +52,6 @@ public class Rating {
 
     public void setBook(Book book) {
         this.book = book;
+        book.getRatings().add(this);
     }
 }

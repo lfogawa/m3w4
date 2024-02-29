@@ -1,6 +1,7 @@
 package com.devinhouse.m03w04.library.repository;
 
 import com.devinhouse.m03w04.library.model.Book;
+import com.devinhouse.m03w04.library.model.Person;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -10,4 +11,6 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
     Optional<Book> findById(Integer bookId);
 
     List<Book> findAll();
+
+    Optional<Book> findByTitleAndRegisteredBy(String title, Person registeredBy);
 }

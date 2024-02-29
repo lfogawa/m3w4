@@ -7,10 +7,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public record BookRequest(Integer bookId, @NotBlank String title, @NotNull Integer year, @NotNull Person registeredBy, List<Rating> ratings) {
-
-    public BookRequest(Book book) {
-        this(book.getBookId(), book.getTitle(), book.getYear(), book.getRegisteredBy(), book.getRatings());
+    public BookRequest {
+        Objects.requireNonNull(title, "title must not be null");
+        Objects.requireNonNull(year, "year must not be null");
+        Objects.requireNonNull(registeredBy, "registeredBy must not be null");
     }
 }

@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/book")
@@ -25,12 +27,6 @@ public class BookController {
 
     public BookController(BookService bookService){
         this.bookService = bookService;
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<BookResponse> get(@PathVariable("id") Integer bookId) throws Exception {
-        BookResponse response = this.bookService.getById(bookId);
-        return ResponseEntity.ok(response);
     }
 
     @GetMapping
@@ -46,5 +42,23 @@ public class BookController {
         BookRequest response = this.bookService.create(body, userInSession);
         UriComponents uriComponents = uriComponentsBuilder.path("/book/{id}").buildAndExpand(response.bookId());
         return ResponseEntity.created(uriComponents.toUri()).body(response);
+    }
+
+    @PostMapping("/{bookId}/assessment")
+    public ResponseEntity<?> addAssessment(
+            @PathVariable Integer bookId,
+            @RequestBody Map<String, Double> requestBody,
+            Authentication authentication) {
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        Double rating = requestBody.get("rating");
+
+        try {
+            bookService.addRatingToBook(bookId, rating, userDetails);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Avaliação adicionada com sucesso.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao adicionar avaliação: " + e.getMessage());
+        }
     }
 }
