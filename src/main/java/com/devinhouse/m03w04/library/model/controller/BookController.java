@@ -56,9 +56,9 @@ public class BookController {
 
         try {
             bookService.addRatingToBook(bookId, rating, userDetails);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Avaliação adicionada com sucesso.");
+            return ResponseEntity.status(HttpStatus.CREATED).body("Rating added successfully.");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao adicionar avaliação: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error when rating: " + e.getMessage());
         }
     }
 }
