@@ -39,6 +39,39 @@ public class BookServiceTest {
     private BookRepository bookRepository;
 
     @Test
+    void testGetByIdSuccess() {
+        Book book = new Book(1, "Sample Book", 2022, new Person("Author", "author@example.com", "Author"));
+
+        when(bookRepository.findById(1)).thenReturn(Optional.of(book));
+
+        PersonService personService = mock(PersonService.class);
+        RatingService ratingService = mock(RatingService.class);
+
+        BookService bookService = new BookService(bookRepository, personService, ratingService);
+
+        ResponseEntity<Book> responseEntity = bookService.getById(1);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertNotNull(responseEntity.getBody());
+        assertEquals("Sample Book", responseEntity.getBody().getTitle());
+        assertEquals(2022, responseEntity.getBody().getYear());
+        assertEquals("Author", responseEntity.getBody().getRegisteredBy().getName());
+    }
+
+    @Test
+    void testGetByIdException() {
+        when(bookRepository.findById(2)).thenReturn(Optional.empty());
+
+        PersonService personService = mock(PersonService.class);
+        RatingService ratingService = mock(RatingService.class);
+
+        BookService bookService = new BookService(bookRepository, personService, ratingService);
+
+        ResponseEntity<Book> errorResponseEntity = bookService.getById(2);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, errorResponseEntity.getStatusCode());
+        assertNull(errorResponseEntity.getBody());
+    }
+
+    @Test
     void createBookWithSuccess() {
         when(personService.findByEmail(null))
                 .thenReturn(new Person("1L", "testuser@example.com", "Test User"));
@@ -116,7 +149,7 @@ public class BookServiceTest {
     }
 
     @Test
-    void testGetAllBooksWithAverageRatingException() {
+    void testGetAllBooksWithAverageRatingReturnsException() {
         when(bookRepository.findAll()).thenThrow(new RuntimeException("Simulating an exception"));
 
         ResponseEntity<List<BookResponse>> responseEntity = bookService.getAllBooksWithAverageRating();

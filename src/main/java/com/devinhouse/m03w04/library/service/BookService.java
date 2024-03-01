@@ -29,9 +29,14 @@ public class BookService {
         this.ratingService = ratingService;
     }
 
-    public Book getById(Integer bookId) throws Exception {
-        return this.bookRepository.findById(bookId)
-                .orElseThrow(() -> new Exception(String.format("Book by id not found: %s", bookId)));
+    public ResponseEntity<Book> getById(Integer bookId) {
+        try {
+            Book book = this.bookRepository.findById(bookId)
+                    .orElseThrow(() -> new Exception(String.format("Book by id not found: %s", bookId)));
+            return ResponseEntity.ok(book);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @Transactional
@@ -92,7 +97,7 @@ public class BookService {
     @Transactional
     public void addRatingToBook(Integer bookId, Double rating, UserDetails userDetails) throws Exception {
         Person person = personService.findByEmail(userDetails.getUsername());
-        Book book = getById(bookId);
+        Book book = getById(bookId).getBody();
 
         if (person.equals(book.getRegisteredBy())) {
             throw new Exception("Usuário não pode avaliar seu próprio livro.");
