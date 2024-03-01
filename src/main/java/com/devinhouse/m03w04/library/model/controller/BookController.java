@@ -31,7 +31,7 @@ public class BookController {
 
     @GetMapping
     public ResponseEntity<List<BookResponse>> getAllBooks() {
-        List<BookResponse> books = bookService.getAllBooksWithAverageRating();
+        List<BookResponse> books = bookService.getAllBooksWithAverageRating().getBody();
         return ResponseEntity.ok(books);
     }
 

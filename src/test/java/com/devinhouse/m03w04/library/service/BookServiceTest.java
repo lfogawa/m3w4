@@ -3,6 +3,8 @@ package com.devinhouse.m03w04.library.service;
 import com.devinhouse.m03w04.library.model.Book;
 import com.devinhouse.m03w04.library.model.Person;
 import com.devinhouse.m03w04.library.model.dtos.BookRequest;
+import com.devinhouse.m03w04.library.model.dtos.BookResponse;
+import com.devinhouse.m03w04.library.model.Rating;
 import com.devinhouse.m03w04.library.repository.BookRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -14,8 +16,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,8 +37,6 @@ public class BookServiceTest {
 
     @Mock
     private BookRepository bookRepository;
-
-    private BookRequest inputBookRequest;
 
     @Test
     void createBookWithSuccess() {
@@ -80,5 +83,44 @@ public class BookServiceTest {
         });
 
         Assertions.assertTrue(exception.getMessage().contains("Title or year must not be null or empty"));
+    }
+
+    @Test
+    void getAllBooksWithAverageRatingWithSuccess() {
+        Book book1 = new Book("Book 1", 2022, new Person("Author 1", "author1@example.com", "Author 1"), Arrays.asList(new Rating(4.0), new Rating(5.0)));
+        Book book2 = new Book("Book 2", 2023, new Person("Author 2", "author2@example.com", "Author 2"), Arrays.asList(new Rating(3.0), new Rating(4.0)));
+
+        when(bookRepository.findAll()).thenReturn(Arrays.asList(book1, book2));
+
+        ResponseEntity<List<BookResponse>> responseEntity = bookService.getAllBooksWithAverageRating();
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        List<BookResponse> bookResponses = responseEntity.getBody();
+        assertNotNull(bookResponses);
+        assertEquals(2, bookResponses.size());
+
+        assertEquals("Book 1", bookResponses.get(0).title());
+        assertEquals(2022, bookResponses.get(0).year());
+        assertEquals("Author 1", bookResponses.get(0).registeredBy().getName());
+        assertEquals(4.5, bookResponses.get(0).averageRating(), 0.01);
+        assertEquals(1, bookResponses.get(0).ratingCounts().get(4.0));
+        assertEquals(1, bookResponses.get(0).ratingCounts().get(5.0));
+
+        assertEquals("Book 2", bookResponses.get(1).title());
+        assertEquals(2023, bookResponses.get(1).year());
+        assertEquals("Author 2", bookResponses.get(1).registeredBy().getName());
+        assertEquals(3.5, bookResponses.get(1).averageRating(), 0.01);
+        assertEquals(1, bookResponses.get(1).ratingCounts().get(3.0));
+        assertEquals(1, bookResponses.get(1).ratingCounts().get(4.0));
+    }
+
+    @Test
+    void testGetAllBooksWithAverageRatingException() {
+        when(bookRepository.findAll()).thenThrow(new RuntimeException("Simulating an exception"));
+
+        ResponseEntity<List<BookResponse>> responseEntity = bookService.getAllBooksWithAverageRating();
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
     }
 }

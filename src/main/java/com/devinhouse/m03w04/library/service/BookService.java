@@ -105,18 +105,24 @@ public class BookService {
         ratingService.addRating(book, person, rating);
     }
 
-    public List<BookResponse> getAllBooksWithAverageRating() {
-        List<Book> books = bookRepository.findAll();
-        return books.stream()
-                .map(book -> new BookResponse(
-                        book.getBookId(),
-                        book.getTitle(),
-                        book.getYear(),
-                        book.getRegisteredBy(),
-                        calculateAverageRating(book),
-                        calculateRatingCounts(book.getRatings())
-                ))
-                .collect(Collectors.toList());
+    public ResponseEntity<List<BookResponse>> getAllBooksWithAverageRating() {
+        try {
+            List<Book> books = bookRepository.findAll();
+            List<BookResponse> bookResponses = books.stream()
+                    .map(book -> new BookResponse(
+                            book.getBookId(),
+                            book.getTitle(),
+                            book.getYear(),
+                            book.getRegisteredBy(),
+                            calculateAverageRating(book),
+                            calculateRatingCounts(book.getRatings())
+                    ))
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(bookResponses);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     private Double calculateAverageRating(Book book) {

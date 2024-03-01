@@ -25,6 +25,10 @@ public class Rating {
     public Rating() {
     }
 
+    public Rating(Double rating) {
+        this.rating = rating;
+    }
+
     public Rating(Person person, Double rating) {
         this.person = person;
         this.rating = rating;
