@@ -39,6 +39,16 @@ public class Person implements UserDetails {
         this.password = password;
     }
 
+    public Person(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
+
+    public Person(String name) {
+        this.name = name;
+    }
+
     public Long getId() {
         return personId;
     }

@@ -39,7 +39,7 @@ public class BookController {
     public ResponseEntity<BookRequest> create(@AuthenticationPrincipal UserDetails userInSession,
                                               @Valid @RequestBody BookRequest body,
                                               UriComponentsBuilder uriComponentsBuilder) throws Exception {
-        BookRequest response = this.bookService.create(body, userInSession);
+        BookRequest response = this.bookService.create(body, userInSession).getBody();
         UriComponents uriComponents = uriComponentsBuilder.path("/book/{id}").buildAndExpand(response.bookId());
         return ResponseEntity.created(uriComponents.toUri()).body(response);
     }

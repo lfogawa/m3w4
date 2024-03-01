@@ -22,6 +22,14 @@ public class Rating {
     @ManyToOne(cascade = CascadeType.ALL)
     private Book book;
 
+    public Rating() {
+    }
+
+    public Rating(Person person, Double rating) {
+        this.person = person;
+        this.rating = rating;
+    }
+
     public Integer getRatingId() {
         return ratingId;
     }

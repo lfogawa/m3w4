@@ -11,9 +11,4 @@ import java.util.Objects;
 import java.util.Optional;
 
 public record BookRequest(Integer bookId, @NotBlank String title, @NotNull Integer year, @NotNull Person registeredBy, List<Rating> ratings) {
-    public BookRequest {
-        Objects.requireNonNull(title, "title must not be null");
-        Objects.requireNonNull(year, "year must not be null");
-        Objects.requireNonNull(registeredBy, "registeredBy must not be null");
-    }
 }

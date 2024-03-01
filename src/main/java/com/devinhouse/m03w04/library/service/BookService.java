@@ -5,15 +5,14 @@ import com.devinhouse.m03w04.library.model.Person;
 import com.devinhouse.m03w04.library.model.dtos.BookRequest;
 import com.devinhouse.m03w04.library.model.dtos.BookResponse;
 import com.devinhouse.m03w04.library.repository.BookRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.devinhouse.m03w04.library.model.Rating;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.devinhouse.m03w04.library.model.dtos.BookResponse.calculateRatingCounts;
@@ -36,32 +35,47 @@ public class BookService {
     }
 
     @Transactional
-    public BookRequest create(BookRequest body, UserDetails userInSession) throws Exception {
-        Person registeredBy = this.personService.findByEmail(userInSession.getUsername());
-        Optional<Book> existingBook = this.bookRepository.findByTitleAndRegisteredBy(body.title(), registeredBy);
+    public ResponseEntity<BookRequest> create(BookRequest body, UserDetails userInSession) {
+        try {
+            Person registeredBy = this.personService.findByEmail(userInSession.getUsername());
+            Optional<Book> existingBook = this.bookRepository.findByTitleAndRegisteredBy(body.title(), registeredBy);
 
-        if (existingBook.isPresent()) {
-            updateExistingRating(Optional.of(existingBook.get()), body.ratings());
-            return new BookRequest(
-                    existingBook.get().getBookId(),
-                    existingBook.get().getTitle(),
-                    existingBook.get().getYear(),
-                    existingBook.get().getRegisteredBy(),
-                    existingBook.get().getRatings()
-            );
-        } else {
-            List<Rating> ratings = (body.ratings() != null) ? body.ratings() : new ArrayList<>();
-            Book newBook = new Book(body.title(), body.year(), registeredBy, ratings);
-            newBook = this.bookRepository.save(newBook);
-            return new BookRequest(
-                    newBook.getBookId(),
-                    newBook.getTitle(),
-                    newBook.getYear(),
-                    newBook.getRegisteredBy(),
-                    newBook.getRatings()
-            );
+            if (existingBook.isPresent()) {
+                updateExistingRating(existingBook, body.ratings());
+                Book updatedBook = existingBook.get();
+                return ResponseEntity.ok(new BookRequest(
+                        updatedBook.getBookId(),
+                        updatedBook.getTitle(),
+                        updatedBook.getYear(),
+                        updatedBook.getRegisteredBy(),
+                        updatedBook.getRatings()
+                ));
+            } else {
+                List<Rating> ratings = (body.ratings() != null) ? body.ratings() : Collections.emptyList();
+                Book newBook = new Book(body.title(), body.year(), registeredBy, ratings);
+
+                if (newBook.getTitle() == null || newBook.getTitle().isEmpty() || newBook.getYear() == null) {
+                    throw new IllegalArgumentException("Title or year must not be null or empty");
+                }
+
+                newBook = this.bookRepository.save(newBook);
+
+                return ResponseEntity.ok(new BookRequest(
+                        newBook.getBookId(),
+                        newBook.getTitle(),
+                        newBook.getYear(),
+                        newBook.getRegisteredBy(),
+                        newBook.getRatings()
+                ));
+            }
+        } catch (IllegalArgumentException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("An error occurred while creating/updating the book.", e);
         }
     }
+
+
 
     private void updateExistingRating(Optional<Book> existingBook, List<Rating> newRatings) {
         existingBook.ifPresent(book -> {

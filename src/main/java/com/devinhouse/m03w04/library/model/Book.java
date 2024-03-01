@@ -3,6 +3,7 @@ package com.devinhouse.m03w04.library.model;
 import jakarta.persistence.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "BOOK")
@@ -56,6 +57,24 @@ public class Book {
         this.ratings = ratings;
     }
 
+    public Book(String title, Person registeredBy) {
+        this.title = title;
+        this.registeredBy = registeredBy;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Book book = (Book) o;
+        return Objects.equals(title, book.title) &&
+                Objects.equals(registeredBy, book.registeredBy);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, registeredBy);
+    }
     public Integer getBookId() {
         return bookId;
     }
