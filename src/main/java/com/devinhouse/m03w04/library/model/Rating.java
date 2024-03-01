@@ -34,6 +34,12 @@ public class Rating {
         this.rating = rating;
     }
 
+    public Rating(Book book, Person person, Double rating) {
+        this.rating = rating;
+        this.person = person;
+        this.book = book;
+    }
+
     public Integer getRatingId() {
         return ratingId;
     }

@@ -2,6 +2,7 @@ package com.devinhouse.m03w04.library.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,7 +27,7 @@ public class Book {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "book_id")
-    private List<Rating> ratings;
+    private List<Rating> ratings = new ArrayList<>();
 
     public Double calculateAverageRating() {
         if (ratings == null || ratings.isEmpty()) {

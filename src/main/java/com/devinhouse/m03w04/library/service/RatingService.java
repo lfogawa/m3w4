@@ -4,7 +4,10 @@ import com.devinhouse.m03w04.library.model.Book;
 import com.devinhouse.m03w04.library.model.Person;
 import com.devinhouse.m03w04.library.model.Rating;
 import com.devinhouse.m03w04.library.repository.RatingRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -18,18 +21,25 @@ public class RatingService {
         this.ratingRepository = ratingRepository;
     }
 
-    public Rating addRating(Book book, Person person, Double rating) {
+    public ResponseEntity<Rating> addRating(Book book, Person person, Double rating) {
         Optional<Rating> existingRating = ratingRepository.findByBookAndPerson(book, person);
 
-        if (existingRating.isPresent()) {
-            existingRating.get().setRating(rating);
-            return ratingRepository.save(existingRating.get());
-        } else {
-            Rating newRating = new Rating();
-            newRating.setBook(book);
-            newRating.setPerson(person);
-            newRating.setRating(rating);
-            return ratingRepository.save(newRating);
+        try {
+            Rating addedRating;
+            if (existingRating.isPresent()) {
+                existingRating.get().setRating(rating);
+                addedRating = ratingRepository.save(existingRating.get());
+            } else {
+                Rating newRating = new Rating();
+                newRating.setBook(book);
+                newRating.setPerson(person);
+                newRating.setRating(rating);
+                addedRating = ratingRepository.save(newRating);
+            }
+
+            return ResponseEntity.ok(addedRating);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error when add rating.", e);
         }
     }
 }

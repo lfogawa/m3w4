@@ -39,7 +39,7 @@ public class BookServiceTest {
     private BookRepository bookRepository;
 
     @Test
-    void testGetByIdSuccess() {
+    void getBookByIdWithSuccess() {
         Book book = new Book(1, "Sample Book", 2022, new Person("Author", "author@example.com", "Author"));
 
         when(bookRepository.findById(1)).thenReturn(Optional.of(book));
@@ -58,7 +58,7 @@ public class BookServiceTest {
     }
 
     @Test
-    void testGetByIdException() {
+    void getBookByIdReturnsException() {
         when(bookRepository.findById(2)).thenReturn(Optional.empty());
 
         PersonService personService = mock(PersonService.class);
@@ -149,7 +149,7 @@ public class BookServiceTest {
     }
 
     @Test
-    void testGetAllBooksWithAverageRatingReturnsException() {
+    void getAllBooksWithAverageRatingReturnsException() {
         when(bookRepository.findAll()).thenThrow(new RuntimeException("Simulating an exception"));
 
         ResponseEntity<List<BookResponse>> responseEntity = bookService.getAllBooksWithAverageRating();
